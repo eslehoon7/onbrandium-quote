@@ -1,0 +1,273 @@
+:root {
+  --brand-red: #e40224;
+  --brand-yellow: #FFBD00;
+  --coral: var(--brand-yellow); /* 메인 액센트를 옐로우로 변경 */
+  --coral-light: #fff3cc;
+  --logo-yellow: var(--brand-yellow);
+  --navy: #333333;
+  --gray-bg: #FFFFFF;
+  --gray-light-bg: #f9f9f9;
+  --gray-border: #eeeeee;
+  --text-dark: #1a1a1a;
+  --text-muted: #666666;
+  --white: #FFFFFF;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Pretendard', sans-serif;
+}
+
+body {
+  background-color: #f0f2f5;
+  color: var(--text-dark);
+  padding: 0;
+}
+
+.flex { display: flex; }
+.flex-wrap { flex-wrap: wrap; }
+.justify-end { justify-content: flex-end; }
+.items-center { align-items: center; }
+.gap-2 { gap: 8px; }
+.gap-4 { gap: 16px; }
+.gap-6 { gap: 24px; }
+.mb-6 { margin-bottom: 24px; }
+.w-full { width: 100%; }
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.overflow-hidden { overflow: hidden; }
+
+@media (min-width: 768px) {
+  .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.gap-6 { gap: 24px; }
+.gap-x-20 { column-gap: 80px; }
+.items-center { align-items: center; }
+.whitespace-nowrap { white-space: nowrap; }
+
+.invoice-container {
+  max-width: 1000px;
+  margin: 20px auto;
+  background: white;
+  padding: 0 80px 80px 80px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+  position: relative;
+  min-height: 1200px;
+  overflow: hidden;
+}
+
+/* Header Styles */
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 50px;
+  align-items: flex-start;
+}
+
+.logo-section {
+  padding-top: 80px; /* 로고 섹션은 기존 패딩만큼 아래로 */
+}
+
+.logo-section h1 {
+  font-size: 24px;
+  font-weight: 900;
+  letter-spacing: -1px;
+}
+
+.invoice-box {
+  background: var(--brand-yellow);
+  color: #1a1a1a; /* 어두운 색으로 가독성 확보 */
+  padding: 30px 60px;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+/* Info Section */
+.info-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.info-title {
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* Table Styles */
+.invoice-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 30px;
+}
+
+.invoice-table th {
+  border-top: 2px solid #333;
+  border-bottom: 2px solid #333;
+  padding: 12px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.invoice-table td {
+  padding: 15px 10px;
+  border-bottom: 1px solid var(--gray-border);
+  font-size: 14px;
+}
+
+/* Total Section */
+.total-section {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+}
+
+.summary-table {
+  width: 250px;
+  font-size: 14px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+}
+
+.summary-row.grand-total {
+  color: var(--brand-red); /* 강조를 위해 레드로 다시 변경 */
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+/* Interactive Controls (Panel on the left or top) */
+.controls-panel {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: #1a1a1a; /* Darker background */
+  color: white;
+  padding: 30px;
+  border-radius: 0 0 12px 12px;
+  display: block;
+}
+
+.control-group {
+  margin-bottom: 20px;
+}
+
+.control-group label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  color: var(--logo-yellow); /* 설정 패널 라벨은 로고 옐로우 적용 */
+}
+
+.controls-panel h3 {
+  color: var(--logo-yellow);
+}
+
+.controls-panel .text-coral {
+  color: var(--logo-yellow) !important;
+}
+
+select, input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: white;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+select:focus, input:focus {
+  outline: none;
+  border-color: var(--coral);
+}
+
+.controls-panel select:focus, .controls-panel input:focus {
+  border-color: var(--logo-yellow);
+}
+
+.controls-panel label input[type="checkbox"]:checked {
+  accent-color: var(--logo-yellow);
+}
+
+/* Footer Section */
+.invoice-footer {
+  margin-top: 100px;
+  border-top: 1px solid #eee;
+  padding-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 30px;
+}
+
+.footer-col h4 {
+  font-size: 13px;
+  font-weight: 800;
+  margin-bottom: 15px;
+}
+
+.footer-col p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.signature-area {
+  margin-top: 50px;
+  text-align: right;
+}
+
+.signature-line {
+  margin-top: 20px;
+  border-top: 1px solid #333;
+  display: inline-block;
+  width: 200px;
+  text-align: center;
+  padding-top: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.actions-fixed {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-action {
+  padding: 15px 25px;
+  border-radius: 50px;
+  border: none;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-coral { background: var(--brand-yellow); color: #1a1a1a; } /* 옐로우 배경엔 검은 글자가 가독성이 좋음 */
+.btn-dark { background: #333; color: white; }
+.btn-red { background: var(--brand-red); color: white; } /* 레드 전용 버튼 클래스 */
+.text-coral { color: var(--brand-yellow) !important; }
+.bg-coral-light { background-color: var(--coral-light) !important; }
+
