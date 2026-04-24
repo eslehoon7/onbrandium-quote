@@ -402,7 +402,7 @@ function App() {
         <div className="invoice-header">
           <div className="logo-section">
             <h1 className="flex items-center">
-              <img src="/logo.png" alt="온브랜디움" style={{ height: '40px', marginRight: '12px' }} />
+              <img src="./logo.png" alt="온브랜디움" style={{ height: '40px', marginRight: '12px' }} />
               온브랜디움(ONBRANDIUM)
             </h1>
             <p className="text-[10px] text-muted mt-2">PREMIUM DIGITAL BRANDING & TRANSFORMATION SERVICES</p>
@@ -518,7 +518,7 @@ function App() {
             <span style={{ position: 'relative', display: 'inline-block', marginLeft: '10px' }}>
               (인)
               <img 
-                src="/signature.png" 
+                src="./signature.png" 
                 alt="서명" 
                 style={{ 
                   position: 'absolute', 
