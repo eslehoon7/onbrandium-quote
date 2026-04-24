@@ -42,6 +42,8 @@ body {
 
 @media (min-width: 768px) {
   .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .md\:col-span-2 { grid-column: span 2 / span 2; }
+  .md\:col-span-3 { grid-column: span 3 / span 3; }
 }
 
 .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -271,3 +273,24 @@ select:focus, input:focus {
 .text-coral { color: var(--brand-yellow) !important; }
 .bg-coral-light { background-color: var(--coral-light) !important; }
 
+/* Print Styles */
+@media print {
+  body {
+    background-color: white !important;
+  }
+  .no-print, .controls-panel, .btn-action, .settings-btn, button {
+    display: none !important;
+  }
+  .invoice-container {
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+  }
+  .no-pdf-print-fix {
+    position: static !important;
+    transform: none !important;
+  }
+}
