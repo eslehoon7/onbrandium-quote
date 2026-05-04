@@ -125,7 +125,9 @@ function App() {
 
   const subtotal = packageItem.price + (subPages * SUB_PAGE_PRICE) + automationSubtotal + (adminPages * adminUnitPrice) + customItemPrice;
   const discountAmount = Math.round(subtotal * (discountRate / 100));
-  const finalPrice = subtotal - discountAmount;
+  const preVatPrice = subtotal - discountAmount;
+  const vat = Math.round(preVatPrice * 0.1);
+  const finalPrice = preVatPrice + vat;
 
   const formatPrice = (price) => new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(price);
 
@@ -502,7 +504,7 @@ function App() {
             )}
             <div className="summary-row">
               <span>부 가 세 (VAT):</span>
-              <span>₩0</span>
+              <span>{formatPrice(vat)}</span>
             </div>
             <div className="summary-row grand-total" style={{ fontSize: '18px', borderTop: '2px solid var(--brand-red)', paddingTop: '10px' }}>
               <span>최종 합계 금액:</span>
