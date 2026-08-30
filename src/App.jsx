@@ -8,9 +8,9 @@ import html2canvas from 'html2canvas';
 
 // Constants
 const PACKAGES = [
-  { id: 'landing', name: '랜딩페이지 패키지', tableName: '랜딩페이지(1페이지-3섹션)', price: 330000 },
-  { id: 'corporate', name: '기업 홈페이지 패키지', tableName: '기업 홈페이지(5페이지 이내)', price: 690000 },
-  { id: 'brand', name: '브랜드 홈페이지 패키지', tableName: '브랜드 홈페이지 패키지(10페이지 이상)', price: 990000 },
+  { id: 'landing', name: '랜딩페이지 패키지', tableName: '랜딩페이지(1페이지-3섹션)', price: 230000 },
+  { id: 'corporate', name: '기업 홈페이지 패키지', tableName: '기업 홈페이지(10페이지 이내)', price: 440000 },
+  { id: 'brand', name: '브랜드 홈페이지 패키지', tableName: '브랜드 홈페이지 패키지(20페이지 이하)', price: 650000 },
 ];
 
 const SUB_PAGE_PRICE = 80000;
@@ -28,7 +28,7 @@ function App() {
 
   // Calculation States
   const [selectedPackageId, setSelectedPackageId] = useState('landing');
-  const [subPages, setSubPages] = useState(1);
+  const [subPages, setSubPages] = useState(0);
   const [selectedAutomations, setSelectedAutomations] = useState([]);
   const [adminPages, setAdminPages] = useState(0);
   const [adminUnitPrice, setAdminUnitPrice] = useState(0);
@@ -59,7 +59,7 @@ function App() {
       try {
         const decoded = JSON.parse(decodeURIComponent(escape(atob(data))));
         if (decoded.p) setSelectedPackageId(decoded.p);
-        if (decoded.s) setSubPages(decoded.s);
+        if (decoded.s !== undefined) setSubPages(decoded.s);
         if (decoded.d) setDiscountRate(decoded.d);
         if (decoded.n) setCustomerName(decoded.n);
         if (decoded.a) setCustomerAddress(decoded.a);
@@ -117,13 +117,65 @@ function App() {
 
   const packageItem = useMemo(() => PACKAGES.find(p => p.id === selectedPackageId), [selectedPackageId]);
 
-  const automationSubtotal = useMemo(() => 
-    AUTOMATIONS.filter(a => selectedAutomations.includes(a.id))
-      .reduce((sum, a) => sum + (automationPrices[a.id] || 0), 0),
-    [selectedAutomations, automationPrices]
-  );
+  const invoiceItems = useMemo(() => {
+    const list = [];
+    
+    // 1. 기본 패키지
+    list.push({
+      name: packageItem.tableName,
+      unitPrice: packageItem.price,
+      quantity: 1,
+      totalPrice: packageItem.price
+    });
+    
+    // 2. 서브 페이지 추가 (0보다 클 때만 노출)
+    if (subPages > 0) {
+      list.push({
+        name: '서브 페이지 추가',
+        unitPrice: SUB_PAGE_PRICE,
+        quantity: subPages,
+        totalPrice: subPages * SUB_PAGE_PRICE
+      });
+    }
+    
+    // 3. 자동화 옵션
+    AUTOMATIONS.filter(a => selectedAutomations.includes(a.id)).forEach(a => {
+      list.push({
+        name: a.name,
+        unitPrice: automationPrices[a.id] || 0,
+        quantity: 1,
+        totalPrice: automationPrices[a.id] || 0
+      });
+    });
+    
+    // 4. 관리자 페이지
+    if (adminUnitPrice > 0 && adminPages > 0) {
+      list.push({
+        name: '관리자 페이지 구축',
+        unitPrice: adminUnitPrice,
+        quantity: adminPages,
+        totalPrice: adminPages * adminUnitPrice
+      });
+    }
+    
+    // 5. 기타 항목
+    if (customItemTitle) {
+      list.push({
+        name: customItemTitle,
+        unitPrice: customItemPrice,
+        quantity: 1,
+        totalPrice: customItemPrice
+      });
+    }
+    
+    return list;
+  }, [packageItem, subPages, selectedAutomations, automationPrices, adminUnitPrice, adminPages, customItemTitle, customItemPrice]);
 
-  const subtotal = packageItem.price + (subPages * SUB_PAGE_PRICE) + automationSubtotal + (adminPages * adminUnitPrice) + customItemPrice;
+  const subtotal = useMemo(() => 
+    invoiceItems.reduce((sum, item) => sum + item.totalPrice, 0),
+    [invoiceItems]
+  );
+  
   const discountAmount = Math.round(subtotal * (discountRate / 100));
   const preVatPrice = subtotal - discountAmount;
   const vat = Math.round(preVatPrice * 0.1);
@@ -245,7 +297,7 @@ function App() {
                 <div className="flex gap-4">
                   <div className="control-group flex-1">
                     <label>서브 페이지 수</label>
-                    <input type="number" min="1" value={subPages} onChange={(e) => setSubPages(parseInt(e.target.value) || 1)} />
+                    <input type="number" min="0" value={subPages} onChange={(e) => setSubPages(parseInt(e.target.value) || 0)} />
                   </div>
                   <div className="control-group flex-1">
                     <label>할인율 (%)</label>
@@ -446,47 +498,15 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1.</td>
-              <td>{packageItem.tableName}</td>
-              <td>{formatPrice(packageItem.price)}</td>
-              <td>1</td>
-              <td className="text-right">{formatPrice(packageItem.price)}</td>
-            </tr>
-            <tr>
-              <td>2.</td>
-              <td>서브 페이지 추가</td>
-              <td>{formatPrice(SUB_PAGE_PRICE)}</td>
-              <td>{subPages}</td>
-              <td className="text-right">{formatPrice(subPages * SUB_PAGE_PRICE)}</td>
-            </tr>
-            {AUTOMATIONS.filter(a => selectedAutomations.includes(a.id)).map((a, index) => (
-              <tr key={a.id}>
-                <td>{index + 3}.</td>
-                <td>{a.name}</td>
-                <td>{formatPrice(automationPrices[a.id] || 0)}</td>
-                <td>1</td>
-                <td className="text-right">{formatPrice(automationPrices[a.id] || 0)}</td>
+            {invoiceItems.map((item, index) => (
+              <tr key={index}>
+                <td>{index + 1}.</td>
+                <td>{item.name}</td>
+                <td>{formatPrice(item.unitPrice)}</td>
+                <td>{item.quantity}</td>
+                <td className="text-right">{formatPrice(item.totalPrice)}</td>
               </tr>
             ))}
-            {adminUnitPrice > 0 && adminPages > 0 && (
-              <tr>
-                <td>{AUTOMATIONS.filter(a => selectedAutomations.includes(a.id)).length + 3}.</td>
-                <td>관리자 페이지 구축</td>
-                <td>{formatPrice(adminUnitPrice)}</td>
-                <td>{adminPages}</td>
-                <td className="text-right">{formatPrice(adminPages * adminUnitPrice)}</td>
-              </tr>
-            )}
-            {customItemTitle && (
-              <tr>
-                <td>{AUTOMATIONS.filter(a => selectedAutomations.includes(a.id)).length + (adminUnitPrice > 0 && adminPages > 0 ? 1 : 0) + 3}.</td>
-                <td>{customItemTitle}</td>
-                <td>{formatPrice(customItemPrice)}</td>
-                <td>1</td>
-                <td className="text-right">{formatPrice(customItemPrice)}</td>
-              </tr>
-            )}
           </tbody>
         </table>
 
