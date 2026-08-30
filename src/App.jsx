@@ -49,7 +49,7 @@ function App() {
   const [customerName, setCustomerName] = useState('고객님 귀하');
   const [customerAddress, setCustomerAddress] = useState('고객님 주소');
   const [projectTitle, setProjectTitle] = useState('회사명');
-  const [bankInfo, setBankInfo] = useState('카카오뱅크 7979-81-98208 (예금주: 조승희)');
+  const [bankInfo, setBankInfo] = useState('카카오뱅크 3333-31-6053795 (예금주:이승훈)');
 
   // URL에서 초기 상태 복원
   useEffect(() => {
