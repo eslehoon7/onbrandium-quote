@@ -43,7 +43,9 @@ function App() {
   });
 
   const [customItemTitle, setCustomItemTitle] = useState('');
-  const [customItemPrice, setCustomItemPrice] = useState(0);
+  const [customItemPrice, setCustomItemPrice] = useState('');
+  const [customItemTitle2, setCustomItemTitle2] = useState('');
+  const [customItemPrice2, setCustomItemPrice2] = useState('');
   
   // Custom Content States
   const [customerName, setCustomerName] = useState('고객님 귀하');
@@ -77,7 +79,9 @@ function App() {
         }
         if (decoded.amv) setAutomationPrices(decoded.amv);
         if (decoded.cit) setCustomItemTitle(decoded.cit);
-        if (decoded.cip) setCustomItemPrice(decoded.cip);
+        if (decoded.cip !== undefined && decoded.cip !== null) setCustomItemPrice(decoded.cip);
+        if (decoded.cit2) setCustomItemTitle2(decoded.cit2);
+        if (decoded.cip2 !== undefined && decoded.cip2 !== null) setCustomItemPrice2(decoded.cip2);
         setIsControlPanelOpen(false); // 링크로 온 경우 설정창 닫기
       } catch (e) {
         console.error('링크 데이터를 읽는 중 오류가 발생했습니다.', e);
@@ -102,7 +106,9 @@ function App() {
       sbi: showBottomInfo,
       amv: automationPrices,
       cit: customItemTitle,
-      cip: customItemPrice
+      cip: customItemPrice !== '' ? Number(customItemPrice) : 0,
+      cit2: customItemTitle2,
+      cip2: customItemPrice2 !== '' ? Number(customItemPrice2) : 0
     };
     // 유니코드 대응 btoa
     const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
@@ -158,18 +164,30 @@ function App() {
       });
     }
     
-    // 5. 기타 항목
-    if (customItemTitle) {
+    // 5. 기타 항목 1
+    if (customItemTitle && customItemTitle.trim() !== '') {
+      const price1 = Number(customItemPrice) || 0;
       list.push({
-        name: customItemTitle,
-        unitPrice: customItemPrice,
+        name: customItemTitle.trim(),
+        unitPrice: price1,
         quantity: 1,
-        totalPrice: customItemPrice
+        totalPrice: price1
+      });
+    }
+
+    // 6. 기타 항목 2
+    if (customItemTitle2 && customItemTitle2.trim() !== '') {
+      const price2 = Number(customItemPrice2) || 0;
+      list.push({
+        name: customItemTitle2.trim(),
+        unitPrice: price2,
+        quantity: 1,
+        totalPrice: price2
       });
     }
     
     return list;
-  }, [packageItem, subPages, selectedAutomations, automationPrices, adminUnitPrice, adminPages, customItemTitle, customItemPrice]);
+  }, [packageItem, subPages, selectedAutomations, automationPrices, adminUnitPrice, adminPages, customItemTitle, customItemPrice, customItemTitle2, customItemPrice2]);
 
   const subtotal = useMemo(() => 
     invoiceItems.reduce((sum, item) => sum + item.totalPrice, 0),
@@ -354,16 +372,53 @@ function App() {
 
             <div className="border-t border-gray-700/50 pt-6 mb-6">
               <label className="text-[13px] font-bold mb-4 block flex items-center gap-2">
-                <Edit3 size={14} className="text-coral"/> 기타 항목 추가 (선택사항)
+                <Edit3 size={14} className="text-coral"/> 기타 항목 추가 1 (선택사항)
               </label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                  <div className="control-group">
-                    <label>기타 항목 명칭</label>
-                    <input type="text" placeholder="예: 도메인/서버 비용" value={customItemTitle} onChange={(e) => setCustomItemTitle(e.target.value)} />
+                    <label>기타 항목 1 명칭</label>
+                    <input 
+                      type="text" 
+                      placeholder="예: 도메인/서버 비용 또는 할인 항목" 
+                      value={customItemTitle} 
+                      onChange={(e) => setCustomItemTitle(e.target.value)} 
+                    />
                  </div>
                  <div className="control-group">
-                    <label>기타 항목 단가 (₩)</label>
-                    <input type="number" min="0" placeholder="0" value={customItemPrice} onChange={(e) => setCustomItemPrice(parseInt(e.target.value) || 0)} />
+                    <label>기타 항목 1 단가 (₩)</label>
+                    <input 
+                      type="number" 
+                      placeholder="0 (- 음수 입력 가능)" 
+                      value={customItemPrice} 
+                      onChange={(e) => setCustomItemPrice(e.target.value)} 
+                    />
+                 </div>
+                 <div className="hidden md:block"></div>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-700/50 pt-6 mb-6">
+              <label className="text-[13px] font-bold mb-4 block flex items-center gap-2">
+                <Edit3 size={14} className="text-coral"/> 기타 항목 추가 2 (선택사항)
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+                 <div className="control-group">
+                    <label>기타 항목 2 명칭</label>
+                    <input 
+                      type="text" 
+                      placeholder="예: 추가 할인 또는 기타 비용" 
+                      value={customItemTitle2} 
+                      onChange={(e) => setCustomItemTitle2(e.target.value)} 
+                    />
+                 </div>
+                 <div className="control-group">
+                    <label>기타 항목 2 단가 (₩)</label>
+                    <input 
+                      type="number" 
+                      placeholder="0 (- 음수 입력 가능)" 
+                      value={customItemPrice2} 
+                      onChange={(e) => setCustomItemPrice2(e.target.value)} 
+                    />
                  </div>
                  <div className="hidden md:block"></div>
               </div>
