@@ -35,6 +35,7 @@ function App() {
   const [showTopAddress, setShowTopAddress] = useState(false);
   const [showBottomInfo, setShowBottomInfo] = useState(true);
   const [discountRate, setDiscountRate] = useState(50);
+  const [modalInfo, setModalInfo] = useState(null);
   
   const [automationPrices, setAutomationPrices] = useState({
     email: 100000,
@@ -42,6 +43,7 @@ function App() {
     slack: 100000,
   });
 
+  const [docTitle, setDocTitle] = useState('견적서');
   const [customItemTitle, setCustomItemTitle] = useState('');
   const [customItemPrice, setCustomItemPrice] = useState('');
   const [deposit, setDeposit] = useState('');
@@ -65,6 +67,7 @@ function App() {
         if (decoded.n) setCustomerName(decoded.n);
         if (decoded.a) setCustomerAddress(decoded.a);
         if (decoded.pt) setProjectTitle(decoded.pt);
+        if (decoded.dt) setDocTitle(decoded.dt);
         if (decoded.b) setBankInfo(decoded.b);
         if (decoded.am) setSelectedAutomations(decoded.am);
         if (decoded.ap) setAdminPages(decoded.ap);
@@ -96,6 +99,7 @@ function App() {
       n: customerName,
       a: customerAddress,
       pt: projectTitle,
+      dt: docTitle,
       b: bankInfo,
       am: selectedAutomations,
       ap: adminPages,
@@ -112,7 +116,15 @@ function App() {
     const url = `${window.location.origin}${window.location.pathname}?q=${encoded}`;
     
     navigator.clipboard.writeText(url).then(() => {
-      alert('공유용 견적 링크가 클립보드에 복사되었습니다. 상대방에게 전달해 보세요!');
+      setModalInfo({
+        title: '공유 링크 복사 완료',
+        message: '공유 링크가 클립보드에 복사되었습니다.\n원하는 곳에 붙여넣기(Ctrl+V)하여 공유해 보세요!'
+      });
+    }).catch(() => {
+      setModalInfo({
+        title: '공유 링크 복사',
+        message: `공유 링크:\n${url}`
+      });
     });
   };
 
@@ -236,7 +248,8 @@ function App() {
         heightLeft -= pageHeight;
       }
       
-      const fileName = `${(projectTitle || '견적서').replace(/[\/\\?%*:|"<>]/g, '_')}_온브랜디움.pdf`;
+      const fileName = `${(projectTitle || docTitle || '견적서').replace(/[\/\\?%*:|"<>]/g, '_')}_온브랜디움.pdf`;
+      let downloadSuccess = true;
       
       // '다른 이름으로 저장' 대화상자 시도 (바탕화면 등 저장 위치 직접 선택 가능)
       if (typeof window.showSaveFilePicker === 'function') {
@@ -257,12 +270,21 @@ function App() {
           if (err.name !== 'AbortError') {
             console.error('Picker error, falling back to default save:', err);
             pdf.save(fileName);
+          } else {
+            downloadSuccess = false;
           }
         }
       } else {
         // 지원하지 않는 브라우저의 경우 기존 방식(다운로드 폴더)으로 저장
         pdf.save(fileName);
         console.log('PDF download triggered via default save');
+      }
+
+      if (downloadSuccess) {
+        setModalInfo({
+          title: '다운로드 완료',
+          message: `${docTitle || '견적서'} PDF 다운로드가 완료되었습니다.`
+        });
       }
     } catch (e) {
       console.error('PDF 다운로드 중 오류 발생:', e);
@@ -315,6 +337,15 @@ function App() {
               {/* 텍스트 설정 1 */}
               <div className="space-y-4">
                 <div className="control-group">
+                  <label className="flex items-center gap-1"><Edit3 size={12}/> 문서 명칭 (구분)</label>
+                  <input 
+                    type="text" 
+                    placeholder="예: 견적서, 청구서, 거래명세서" 
+                    value={docTitle} 
+                    onChange={(e) => setDocTitle(e.target.value)} 
+                  />
+                </div>
+                <div className="control-group">
                   <label className="flex items-center gap-1"><User size={12}/> 수신인 명칭</label>
                   <input type="text" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
                 </div>
@@ -333,7 +364,7 @@ function App() {
                 <div className="control-group">
                   <label className="flex items-center gap-1"><CreditCard size={12}/> 계좌 정보</label>
                   <input 
-                    type="text"
+                    type="text" 
                     value={bankInfo} 
                     onChange={(e) => setBankInfo(e.target.value)} 
                   />
@@ -496,7 +527,9 @@ function App() {
             </h1>
             <p className="text-[10px] text-muted mt-2">PREMIUM DIGITAL BRANDING & TRANSFORMATION SERVICES</p>
           </div>
-          <div className="invoice-box" style={{ fontSize: '24px', padding: '120px 40px 30px 40px', marginTop: '0px', display: 'flex', alignItems: 'flex-end' }}>견 적 서</div>
+          <div className="invoice-box" style={{ fontSize: '24px', padding: '120px 40px 30px 40px', marginTop: '0px', display: 'flex', alignItems: 'flex-end' }}>
+            {docTitle && docTitle.length <= 4 && !docTitle.includes(' ') ? docTitle.split('').join(' ') : (docTitle || '견 적 서')}
+          </div>
         </div>
 
         <div className="info-section">
@@ -586,7 +619,7 @@ function App() {
         </div>
 
         <div className="signature-area" style={{ marginTop: '80px' }}>
-          <p className="text-[14px] mb-4">위와 같이 견적서를 제출합니다.</p>
+          <p className="text-[14px] mb-4">위와 같이 {docTitle || '견적서'}를 제출합니다.</p>
           <div className="signature-line" style={{ width: '250px', fontSize: '14px', position: 'relative' }}>
             온브랜디움 대표 
             <span style={{ position: 'relative', display: 'inline-block', marginLeft: '10px' }}>
@@ -652,10 +685,64 @@ function App() {
           {isGeneratingPDF ? (
             <span className="flex items-center gap-2">PDF를 생성하는 중...</span>
           ) : (
-            <><Download size={18} className="mr-2" /> 견적서 PDF 다운로드</>
+            <><Download size={18} className="mr-2" /> {docTitle || '견적서'} PDF 다운로드</>
           )}
         </button>
       </div>
+
+      {/* 팝업 모달 알림창 */}
+      <AnimatePresence>
+        {modalInfo && (
+          <div 
+            className="no-print"
+            style={{ 
+              position: 'fixed', 
+              top: 0, 
+              left: 0, 
+              right: 0, 
+              bottom: 0, 
+              backgroundColor: 'rgba(0,0,0,0.6)', 
+              zIndex: 9999, 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              backdropFilter: 'blur(3px)'
+            }}
+            onClick={() => setModalInfo(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.85, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.85, opacity: 0 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ 
+                background: '#ffffff', 
+                borderRadius: '16px', 
+                padding: '32px 24px', 
+                maxWidth: '360px', 
+                width: '90%', 
+                textAlign: 'center', 
+                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                color: '#1a1a1a'
+              }}
+            >
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#fff3cc', color: '#d99b00', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' }}>
+                <CheckCircle size={32} />
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '8px', color: '#1a1a1a' }}>{modalInfo.title}</h3>
+              <p style={{ fontSize: '14px', color: '#666', marginBottom: '24px', lineHeight: '1.5', whiteSpace: 'pre-line' }}>{modalInfo.message}</p>
+              <button 
+                onClick={() => setModalInfo(null)} 
+                className="btn-action btn-coral" 
+                style={{ width: '100%', justifyContent: 'center', padding: '12px 0', borderRadius: '10px', fontSize: '15px', fontWeight: '700' }}
+              >
+                확인
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
