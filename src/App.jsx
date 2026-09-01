@@ -10,7 +10,7 @@ import html2canvas from 'html2canvas';
 const PACKAGES = [
   { id: 'landing', name: '랜딩페이지 패키지', tableName: '랜딩페이지(1페이지-3섹션)', price: 230000 },
   { id: 'corporate', name: '기업 홈페이지 패키지', tableName: '기업 홈페이지(10페이지 이내)', price: 440000 },
-  { id: 'brand', name: '브랜드 홈페이지 패키지', tableName: '브랜드 홈페이지 패키지(20페이지 이하)', price: 650000 },
+  { id: 'brand', name: '브랜드 홈페이지 패키지 (10페이지 이상)', tableName: '브랜드 홈페이지 패키지(10페이지 이상)', price: 990000 },
 ];
 
 const SUB_PAGE_PRICE = 80000;
