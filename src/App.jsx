@@ -44,8 +44,7 @@ function App() {
 
   const [customItemTitle, setCustomItemTitle] = useState('');
   const [customItemPrice, setCustomItemPrice] = useState('');
-  const [customItemTitle2, setCustomItemTitle2] = useState('');
-  const [customItemPrice2, setCustomItemPrice2] = useState('');
+  const [deposit, setDeposit] = useState('');
   
   // Custom Content States
   const [customerName, setCustomerName] = useState('고객님 귀하');
@@ -80,8 +79,7 @@ function App() {
         if (decoded.amv) setAutomationPrices(decoded.amv);
         if (decoded.cit) setCustomItemTitle(decoded.cit);
         if (decoded.cip !== undefined && decoded.cip !== null) setCustomItemPrice(decoded.cip);
-        if (decoded.cit2) setCustomItemTitle2(decoded.cit2);
-        if (decoded.cip2 !== undefined && decoded.cip2 !== null) setCustomItemPrice2(decoded.cip2);
+        if (decoded.dp !== undefined && decoded.dp !== null) setDeposit(decoded.dp);
         setIsControlPanelOpen(false); // 링크로 온 경우 설정창 닫기
       } catch (e) {
         console.error('링크 데이터를 읽는 중 오류가 발생했습니다.', e);
@@ -107,8 +105,7 @@ function App() {
       amv: automationPrices,
       cit: customItemTitle,
       cip: customItemPrice !== '' ? Number(customItemPrice) : 0,
-      cit2: customItemTitle2,
-      cip2: customItemPrice2 !== '' ? Number(customItemPrice2) : 0
+      dp: deposit !== '' ? Number(deposit) : 0
     };
     // 유니코드 대응 btoa
     const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
@@ -164,7 +161,7 @@ function App() {
       });
     }
     
-    // 5. 기타 항목 1
+    // 5. 기타 항목
     if (customItemTitle && customItemTitle.trim() !== '') {
       const price1 = Number(customItemPrice) || 0;
       list.push({
@@ -174,20 +171,9 @@ function App() {
         totalPrice: price1
       });
     }
-
-    // 6. 기타 항목 2
-    if (customItemTitle2 && customItemTitle2.trim() !== '') {
-      const price2 = Number(customItemPrice2) || 0;
-      list.push({
-        name: customItemTitle2.trim(),
-        unitPrice: price2,
-        quantity: 1,
-        totalPrice: price2
-      });
-    }
     
     return list;
-  }, [packageItem, subPages, selectedAutomations, automationPrices, adminUnitPrice, adminPages, customItemTitle, customItemPrice, customItemTitle2, customItemPrice2]);
+  }, [packageItem, subPages, selectedAutomations, automationPrices, adminUnitPrice, adminPages, customItemTitle, customItemPrice]);
 
   const subtotal = useMemo(() => 
     invoiceItems.reduce((sum, item) => sum + item.totalPrice, 0),
@@ -198,6 +184,8 @@ function App() {
   const preVatPrice = subtotal - discountAmount;
   const vat = Math.round(preVatPrice * 0.1);
   const finalPrice = preVatPrice + vat;
+  const depositAmount = Number(deposit) || 0;
+  const remainingPrice = finalPrice - depositAmount;
 
   const formatPrice = (price) => new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(price);
 
@@ -372,11 +360,11 @@ function App() {
 
             <div className="border-t border-gray-700/50 pt-6 mb-6">
               <label className="text-[13px] font-bold mb-4 block flex items-center gap-2">
-                <Edit3 size={14} className="text-coral"/> 기타 항목 추가 1 (선택사항)
+                <Edit3 size={14} className="text-coral"/> 기타 항목 추가 (선택사항)
               </label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                  <div className="control-group">
-                    <label>기타 항목 1 명칭</label>
+                    <label>기타 항목 명칭</label>
                     <input 
                       type="text" 
                       placeholder="예: 도메인/서버 비용 또는 할인 항목" 
@@ -385,7 +373,7 @@ function App() {
                     />
                  </div>
                  <div className="control-group">
-                    <label>기타 항목 1 단가 (₩)</label>
+                    <label>기타 항목 단가 (₩)</label>
                     <input 
                       type="number" 
                       placeholder="0 (- 음수 입력 가능)" 
@@ -399,27 +387,19 @@ function App() {
 
             <div className="border-t border-gray-700/50 pt-6 mb-6">
               <label className="text-[13px] font-bold mb-4 block flex items-center gap-2">
-                <Edit3 size={14} className="text-coral"/> 기타 항목 추가 2 (선택사항)
+                <CreditCard size={14} className="text-coral"/> 계약금 설정 (선택사항)
               </label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                  <div className="control-group">
-                    <label>기타 항목 2 명칭</label>
-                    <input 
-                      type="text" 
-                      placeholder="예: 추가 할인 또는 기타 비용" 
-                      value={customItemTitle2} 
-                      onChange={(e) => setCustomItemTitle2(e.target.value)} 
-                    />
-                 </div>
-                 <div className="control-group">
-                    <label>기타 항목 2 단가 (₩)</label>
+                    <label>계약금 (선입금액) (₩)</label>
                     <input 
                       type="number" 
-                      placeholder="0 (- 음수 입력 가능)" 
-                      value={customItemPrice2} 
-                      onChange={(e) => setCustomItemPrice2(e.target.value)} 
+                      placeholder="0 (입력 시 최종 잔금 자동 계산)" 
+                      value={deposit} 
+                      onChange={(e) => setDeposit(e.target.value)} 
                     />
                  </div>
+                 <div className="hidden md:block"></div>
                  <div className="hidden md:block"></div>
               </div>
             </div>
@@ -566,7 +546,7 @@ function App() {
         </table>
 
         <div className="total-section" style={{ justifyContent: 'flex-end' }}>
-          <div className="summary-table">
+          <div className="summary-table" style={{ width: '280px' }}>
             <div className="summary-row">
               <span>공급 가액 소계:</span>
               <span>{formatPrice(subtotal)}</span>
@@ -581,10 +561,27 @@ function App() {
               <span>부 가 세 (VAT):</span>
               <span>{formatPrice(vat)}</span>
             </div>
-            <div className="summary-row grand-total" style={{ fontSize: '18px', borderTop: '2px solid var(--brand-red)', paddingTop: '10px' }}>
-              <span>최종 합계 금액:</span>
-              <span>{formatPrice(finalPrice)}</span>
-            </div>
+            {depositAmount > 0 ? (
+              <>
+                <div className="summary-row" style={{ borderTop: '1px solid #eee', paddingTop: '8px', marginTop: '6px', fontWeight: '700' }}>
+                  <span>최종 합계 금액:</span>
+                  <span>{formatPrice(finalPrice)}</span>
+                </div>
+                <div className="summary-row" style={{ color: '#555' }}>
+                  <span>계약금 (선입금):</span>
+                  <span>- {formatPrice(depositAmount)}</span>
+                </div>
+                <div className="summary-row grand-total" style={{ fontSize: '18px', borderTop: '2px solid var(--brand-red)', paddingTop: '10px' }}>
+                  <span>최종 잔금:</span>
+                  <span>{formatPrice(remainingPrice)}</span>
+                </div>
+              </>
+            ) : (
+              <div className="summary-row grand-total" style={{ fontSize: '18px', borderTop: '2px solid var(--brand-red)', paddingTop: '10px' }}>
+                <span>최종 합계 금액:</span>
+                <span>{formatPrice(finalPrice)}</span>
+              </div>
+            )}
           </div>
         </div>
 
