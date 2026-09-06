@@ -10,7 +10,7 @@ import html2canvas from 'html2canvas';
 const PACKAGES = [
   { id: 'landing', name: '랜딩페이지 패키지', tableName: '랜딩페이지(1페이지-3섹션)', price: 230000 },
   { id: 'corporate', name: '기업 홈페이지 패키지', tableName: '기업 홈페이지(10페이지 이내)', price: 440000 },
-  { id: 'brand', name: '브랜드 홈페이지 패키지 (10페이지 이상)', tableName: '브랜드 홈페이지 패키지(10페이지 이상)', price: 990000 },
+  { id: 'brand', name: '브랜드 홈페이지 패키지 (20페이지 이내)', tableName: '브랜드 홈페이지 패키지(20페이지 이내)', price: 660000 },
 ];
 
 const SUB_PAGE_PRICE = 80000;
@@ -230,23 +230,27 @@ function App() {
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
       
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210; 
-      const pageHeight = 295; // A4 height (leaving 2mm margin)
+      const pageWidth = 210; 
+      const pageHeight = 297; 
+      
+      // 전체 견적서가 A4 1페이지에 딱 맞게 자동 비율 계산
+      const imgWidth = pageWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
+      
+      let renderWidth = imgWidth;
+      let renderHeight = imgHeight;
+      let posX = 0;
+      let posY = 0;
 
-      // 첫 페이지 추가
-      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      // 내용이 더 있으면 다음 페이지들 추가
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      if (renderHeight > pageHeight) {
+        // 세로가 A4 1장을 넘을 경우, 1장에 꽉 차도록 비율 축소
+        const scaleRatio = pageHeight / renderHeight;
+        renderWidth = renderWidth * scaleRatio;
+        renderHeight = pageHeight;
+        posX = (pageWidth - renderWidth) / 2; // 좌우 중앙 정렬
       }
+
+      pdf.addImage(imgData, 'JPEG', posX, posY, renderWidth, renderHeight);
       
       const fileName = `${(projectTitle || docTitle || '견적서').replace(/[\/\\?%*:|"<>]/g, '_')}_온브랜디움.pdf`;
       let downloadSuccess = true;
@@ -311,6 +315,13 @@ function App() {
               <h3 className="text-sm font-bold flex items-center gap-2">
                 <Edit3 size={16} className="text-coral" /> 상세 견적 조건 설정
               </h3>
+              <button 
+                onClick={() => setIsControlPanelOpen(false)}
+                className="btn-action btn-coral" 
+                style={{ padding: '8px 20px', fontSize: '13px', borderRadius: '8px' }}
+              >
+                <CheckCircle size={16} className="mr-1" /> 설정 완료 및 닫기
+              </button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-2">
@@ -491,17 +502,6 @@ function App() {
                 </div>
               </div>
             </div>
-
-            {/* 하단 버튼 영역 */}
-            <div className="flex justify-end pt-6 border-top border-gray-700">
-              <button 
-                onClick={() => setIsControlPanelOpen(false)}
-                className="btn-action btn-coral" 
-                style={{ padding: '12px 30px', fontSize: '15px', borderRadius: '10px' }}
-              >
-                <CheckCircle size={18} className="mr-2" /> 설정 완료 및 닫기
-              </button>
-            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -527,7 +527,7 @@ function App() {
             </h1>
             <p className="text-[10px] text-muted mt-2">PREMIUM DIGITAL BRANDING & TRANSFORMATION SERVICES</p>
           </div>
-          <div className="invoice-box" style={{ fontSize: '24px', padding: '120px 40px 30px 40px', marginTop: '0px', display: 'flex', alignItems: 'flex-end' }}>
+          <div className="invoice-box" style={{ fontSize: '26px', padding: '30px 45px', marginTop: '0px', display: 'flex', alignItems: 'flex-end' }}>
             {docTitle && docTitle.length <= 4 && !docTitle.includes(' ') ? docTitle.split('').join(' ') : (docTitle || '견 적 서')}
           </div>
         </div>
@@ -543,10 +543,10 @@ function App() {
           </div>
         </div>
 
-        <div className="info-section" style={{ borderTop: '1px solid #eee', paddingTop: '20px' }}>
-          <div style={{ padding: '10px 0' }}>
-             <h4 className="info-title" style={{ marginBottom: '8px' }}>프로젝트 (PROJECT):</h4>
-             <p style={{ fontSize: '24px', fontWeight: '900', color: '#1a1a1a' }}>{projectTitle}</p>
+        <div className="info-section" style={{ borderTop: '1px solid #eee', paddingTop: '15px' }}>
+          <div style={{ padding: '6px 0' }}>
+             <h4 className="info-title" style={{ marginBottom: '6px' }}>프로젝트 (PROJECT):</h4>
+             <p style={{ fontSize: '22px', fontWeight: '900', color: '#1a1a1a' }}>{projectTitle}</p>
           </div>
           <div className="text-right">
             <p>견적 번호: #OB-{Math.floor(Math.random() * 1000000)}</p>
@@ -618,7 +618,7 @@ function App() {
           </div>
         </div>
 
-        <div className="signature-area" style={{ marginTop: '80px' }}>
+        <div className="signature-area" style={{ marginTop: '25px' }}>
           <p className="text-[14px] mb-4">위와 같이 {docTitle || '견적서'}를 제출합니다.</p>
           <div className="signature-line" style={{ width: '250px', fontSize: '14px', position: 'relative' }}>
             온브랜디움 대표 

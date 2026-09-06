@@ -53,13 +53,12 @@ body {
 .whitespace-nowrap { white-space: nowrap; }
 
 .invoice-container {
-  max-width: 1000px;
+  max-width: 950px;
   margin: 20px auto;
   background: white;
-  padding: 0 80px 80px 80px;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+  padding: 0 50px 40px 50px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.1);
   position: relative;
-  min-height: 1200px;
   overflow: hidden;
 }
 
@@ -67,25 +66,25 @@ body {
 .invoice-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 50px;
+  margin-bottom: 25px;
   align-items: flex-start;
 }
 
 .logo-section {
-  padding-top: 80px; /* 로고 섹션은 기존 패딩만큼 아래로 */
+  padding-top: 40px;
 }
 
 .logo-section h1 {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 900;
   letter-spacing: -1px;
 }
 
 .invoice-box {
   background: var(--brand-yellow);
-  color: #1a1a1a; /* 어두운 색으로 가독성 확보 */
-  padding: 30px 60px;
-  font-size: 32px;
+  color: #1a1a1a;
+  padding: 30px 45px;
+  font-size: 28px;
   font-weight: 800;
   letter-spacing: 2px;
 }
@@ -94,15 +93,15 @@ body {
 .info-section {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .info-title {
   font-weight: 800;
   text-transform: uppercase;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   color: #333;
 }
 
@@ -110,13 +109,13 @@ body {
 .invoice-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 30px;
+  margin-top: 15px;
 }
 
 .invoice-table th {
   border-top: 2px solid #333;
   border-bottom: 2px solid #333;
-  padding: 12px 10px;
+  padding: 8px 8px;
   font-size: 12px;
   font-weight: 800;
   text-align: left;
@@ -124,33 +123,33 @@ body {
 }
 
 .invoice-table td {
-  padding: 15px 10px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--gray-border);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* Total Section */
 .total-section {
   display: flex;
   justify-content: space-between;
-  margin-top: 40px;
+  margin-top: 20px;
 }
 
 .summary-table {
-  width: 250px;
-  font-size: 14px;
+  width: 280px;
+  font-size: 13px;
 }
 
 .summary-row {
   display: flex;
   justify-content: space-between;
-  padding: 5px 0;
+  padding: 4px 0;
 }
 
 .summary-row.grand-total {
   color: var(--brand-red); /* 강조를 위해 레드로 다시 변경 */
   font-weight: 800;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 /* Interactive Controls (Panel on the left or top) */
@@ -210,38 +209,38 @@ select:focus, input:focus {
 
 /* Footer Section */
 .invoice-footer {
-  margin-top: 100px;
+  margin-top: 35px;
   border-top: 1px solid #eee;
-  padding-top: 30px;
+  padding-top: 18px;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 30px;
+  gap: 20px;
 }
 
 .footer-col h4 {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
-  margin-bottom: 15px;
+  margin-bottom: 8px;
 }
 
 .footer-col p {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .signature-area {
-  margin-top: 50px;
+  margin-top: 30px;
   text-align: right;
 }
 
 .signature-line {
-  margin-top: 20px;
+  margin-top: 10px;
   border-top: 1px solid #333;
   display: inline-block;
   width: 200px;
   text-align: center;
-  padding-top: 10px;
+  padding-top: 8px;
   font-size: 12px;
   font-weight: 700;
 }
