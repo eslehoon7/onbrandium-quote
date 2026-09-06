@@ -30,6 +30,7 @@ body {
 .flex { display: flex; }
 .flex-wrap { flex-wrap: wrap; }
 .justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
 .items-center { align-items: center; }
 .gap-2 { gap: 8px; }
 .gap-4 { gap: 16px; }

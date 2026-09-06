@@ -311,14 +311,14 @@ function App() {
             className="controls-panel overflow-hidden no-print" 
             style={{ position: 'sticky', top: 0, zIndex: 100, marginBottom: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.3)' }}
           >
-            <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4">
+            <div className="flex justify-between items-center mb-6 border-b border-gray-700 pb-4" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
               <h3 className="text-sm font-bold flex items-center gap-2">
                 <Edit3 size={16} className="text-coral" /> 상세 견적 조건 설정
               </h3>
               <button 
                 onClick={() => setIsControlPanelOpen(false)}
                 className="btn-action btn-coral" 
-                style={{ padding: '8px 20px', fontSize: '13px', borderRadius: '8px' }}
+                style={{ padding: '8px 20px', fontSize: '13px', borderRadius: '8px', marginLeft: 'auto' }}
               >
                 <CheckCircle size={16} className="mr-1" /> 설정 완료 및 닫기
               </button>
